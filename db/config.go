@@ -32,7 +32,7 @@ func NewConfig() Config {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	cfg.dsn = fmt.Sprintf("mongodb://%s:%s@%s:%d/%s", cfg.dbUser, cfg.dbPass, cfg.dbHost, cfg.dbPort, cfg.dbName)
+	cfg.dsn = fmt.Sprintf("%s:%s@%s:%d/%s", cfg.dbUser, cfg.dbPass, cfg.dbHost, cfg.dbPort, cfg.dbName)
 	return &cfg
 }
 

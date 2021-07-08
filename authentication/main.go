@@ -17,7 +17,7 @@ func init() {
 }
 
 func main() {
-	if local {
+	if local { 
 		// load environment values
 		err := godotenv.Load()
 		if err != nil {
