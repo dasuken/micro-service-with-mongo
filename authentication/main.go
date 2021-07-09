@@ -31,4 +31,6 @@ func main() {
 		log.Panic(err)
 	}
 	defer conn.Close()
+
+	// repo := repository.NewUsersRepository(conn)
 }
