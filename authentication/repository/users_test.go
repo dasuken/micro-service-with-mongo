@@ -18,6 +18,20 @@ func init() {
 	if err != nil {
 		log.Panicln(err)
 	}
+	cfg := db.NewConfig()
+	conn, err := db.NewConnection(cfg)
+	defer conn.Close()
+
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	r := NewUsersRepository(conn)
+	err = r.DeleteAll()
+	if err != nil {
+		log.Panicln(err)
+	}
+
 }
 
 func TestUserRepositorySave(t *testing.T) {

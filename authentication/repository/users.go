@@ -16,6 +16,7 @@ type UsersRepository interface {
 	GetAll() (users []*models.User, err error)
 	Update(user *models.User) error
 	Delete(id string) error
+	DeleteAll() error
 }
 
 type usersRepository struct {
