@@ -143,9 +143,11 @@ func TestUserRepositoryUpdate(t *testing.T) {
 	err  = r.Update(user)
 	assert.NoError(t, err)
 
-	found, err = r.GetById(bson.NewObjectId().Hex())
-	assert.NoError(t, err)
+	found, err = r.GetById(user.Id.Hex())
 	assert.Equal(t, "UPDATE", found.Name)
+
+	found, err = r.GetById(bson.NewObjectId().Hex())
+	assert.Error(t, err)
 }
 
 func TestUsersRepositoryDelete(t *testing.T) {
