@@ -2,17 +2,25 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 	"log"
+	"microservices/authentication/repository"
+	"microservices/authentication/service"
 	"microservices/db"
+	"microservices/pb"
+	"net"
 )
 
 var (
 	local bool
+	port int
 )
 
 func init() {
-	flag.BoolVar(&local, "local", true, "tun service local")
+	flag.IntVar(&port, "port", 9001, "authentication service port")
+	flag.BoolVar(&local, "local", true, "run service local")
 	flag.Parse()
 }
 
@@ -32,5 +40,18 @@ func main() {
 	}
 	defer conn.Close()
 
-	// repo := repository.NewUsersRepository(conn)
+	repo := repository.NewUsersRepository(conn)
+	authService := service.NewAuthService(repo)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterAuthServiceServer(grpcServer, authService)
+
+	log.Printf("Authentication service runnning on [::]:%d\n", port)
+
+	grpcServer.Serve(lis)
 }

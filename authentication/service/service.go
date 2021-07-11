@@ -4,6 +4,7 @@ import (
 	"context"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 	"microservices/authentication/models"
 	"microservices/authentication/repository"
 	"microservices/authentication/validators"
@@ -17,7 +18,7 @@ type authService struct {
 	usersRepository repository.UsersRepository
 }
 
-func NewAuthService(usersRepository repository.UsersRepository) *authService {
+func NewAuthService(usersRepository repository.UsersRepository) pb.AuthServiceServer {
 	return &authService{usersRepository: usersRepository}
 }
 
@@ -53,15 +54,17 @@ func (s *authService) SignUp(ctx context.Context, req *pb.User) (*pb.User, error
 	return nil, validators.ErrEmailAlreadyExists
 }
 
-//func (s *authService) SignIn(ctx context.Context, req *pb.SignInRequest) (*pb.SignInResponse, error) {
-//	req.Email = validators.NormalizeEmail(req.Email)
-//
-//	user, err := s.usersRepository.GetByEmail(req.Email)
-//	if err != nil {
-//		log.Println("signin failed", err.Error())
-//		return nil, validators.ErrSignInFailed
-//	}
-//}
+func (s *authService) SignIn(ctx context.Context, req *pb.SignInRequest) (*pb.SignInResponse, error) {
+	req.Email = validators.NormalizeEmail(req.Email)
+
+	_, err := s.usersRepository.GetByEmail(req.Email)
+	if err != nil {
+		log.Println("signin failed", err.Error())
+		return nil, validators.ErrSignInFailed
+	}
+
+	return nil, nil
+}
 
 func (s *authService) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {
 	if !bson.IsObjectIdHex(req.Id) {
@@ -122,3 +125,4 @@ func (s *authService) DeleteUser(ctx context.Context, req *pb.GetUserRequest) (*
 	}
 	return &pb.DeleteUserResponse{Id: req.Id}, nil
 }
+
