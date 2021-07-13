@@ -23,7 +23,7 @@ func  NewAuthRoutes(authHandlers resthandlers.AuthHandlers) []*Route {
 			Handler: authHandlers.GetUsers,
 		},
 		{
-			Path: "/users",
+			Path: "/users/{id}",
 			Method: http.MethodPut,
 			Handler: authHandlers.PutUser,
 		},
