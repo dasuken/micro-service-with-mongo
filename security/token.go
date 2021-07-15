@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
+	"log"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -32,6 +35,16 @@ func parseJwtCallback(token *jwt.Token) (interface{}, error) {
 
 func ParseToken(tokenString string) (*jwt.Token, error) {
 	return jwt.Parse(tokenString, parseJwtCallback)
+}
+
+func ExtractToken(r *http.Request) (string, error) {
+	header := strings.TrimSpace(r.Header.Get("Authorization"))
+	splitted := strings.Split(header, " ")
+	if len(splitted) != 2 {
+		log.Println("error on extract token from header", header)
+		return "", ErrInvalidToken
+	}
+	return splitted[1], nil
 }
 
 type TokenPayload struct {

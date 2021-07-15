@@ -3,15 +3,18 @@ package restutil
 import (
 	"encoding/json"
 	"errors"
+	"github.com/gorilla/mux"
+	"microservices/security"
 	"net/http"
 )
 
 var (
-	ErrEmptyBody = errors.New("body can't empty")
+	ErrEmptyBody    = errors.New("body can't empty")
+	ErrUnauthorized = errors.New("unauthorized user")
 )
 
 type JError struct {
-	Error  string `json:"error"`
+	Error string `json:"error"`
 }
 
 func WriteAsJson(w http.ResponseWriter, statusCode int, data interface{}) {
@@ -26,4 +29,20 @@ func WriteError(w http.ResponseWriter, statusCode int, err error) {
 		e = err.Error()
 	}
 	WriteAsJson(w, statusCode, JError{e})
+}
+
+func AuthRequestsWithId(r *http.Request) (*security.TokenPayload, error) {
+	token, err := security.ExtractToken(r)
+	if err != nil {
+		return nil, err
+	}
+	vars := mux.Vars(r)
+	payload, err := security.NewTokenPayload(token)
+	if err != nil {
+		return nil, err
+	}
+	if payload.UserId != vars["id"] {
+		return nil, ErrUnauthorized
+	}
+	return payload, nil
 }
