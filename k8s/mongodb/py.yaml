@@ -1,48 +1,10 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: mongodb
-## 動的プロビジョニング kubernetes.io/gce-pd
-provisioner: kubernetes.io/no-provisioner
-## PVC作成時に即座にpvに紐づけるか否か デフォルトはimmediate
-volumeBindingMode: WaitForFirstConsumer
-## volumeの拡張を許可するか
-allowVolumeExpansion: true
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mongodb
-spec:
-  capacity:
-    storage: 2Gi
-  volumeMode: Filesystem
-  ## 単一nodeで読み書き可能
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  ## 定義したstorage classを元に作成される
-  storageClassName: mongodb
-  local:
-    path: /data
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - minikube
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongodb
 spec:
-  storageClassName: mongodb
   accessModes:
     - ReadWriteOnce
-  volumeMode: Filesystem
   resources:
     requests:
       storage: 1Gi

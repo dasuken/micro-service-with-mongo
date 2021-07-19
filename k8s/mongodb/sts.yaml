@@ -27,8 +27,6 @@ spec:
               readOnly: true
             - name: mongo-data
               mountPath: /data/db
-      nodeSelector:
-        kubernetes.io/hostname: minikube
       volumes:
         - name: mongo-data
           persistentVolumeClaim:
